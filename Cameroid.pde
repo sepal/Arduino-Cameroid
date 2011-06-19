@@ -11,6 +11,7 @@
 Cameroid cam(7, 6, 5, 4);
 
 void setup() {
+  Serial.begin(
   cam.setup();
 }
 
