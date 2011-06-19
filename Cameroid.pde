@@ -1,4 +1,9 @@
 
+#include <ByteUtilities.h>
+#include <OSCMessage.h>
+#include <SLIP.h>
+#include <SLIPSerialUsb.h>
+
 #include "Cameroid.h"
 
 

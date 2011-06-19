@@ -41,7 +41,7 @@
 class Cameroid : public Masteroid
 {
 public:
-  Cameroid(int recordPin, int potINCPin, int potUDPin, int potCSPin) : hmc(int recordPin, int potINCPin, int potUDPin, int potCSPin)
+  Cameroid(int recordPin, int potINCPin, int potUDPin, int potCSPin) : hmc(recordPin, potINCPin, potUDPin, potCSPin)
   {}
 protected:
   void init()
@@ -70,14 +70,14 @@ protected:
     if (address.startsWith("/cameroid"))
     {
       if (address.equals("/cameroid/zoom") && typetag.equals("i")) {
-        int speed = 
-        hmc->zoom(speed);
+        int speed = msg->getInt(0); 
+        hmc.zooming(speed);
       } else if (address.equals("/cameroid/zoomreset") && typetag.equals("i"))
       {
-        hmc->zoomReset((msg->getInt(0)) ? TRUE : FALSE);
+        hmc.zoomReset((msg->getInt(0)) ? true : false);
       } else if (address.equals("/cameroid/record") && typetag.equals("i"))
       {
-        hmc->record((msg->getInt(0)) ? TRUE : FALSE);
+        hmc.record((msg->getInt(0)) ? true : false);
       }
     }
   }

@@ -4,12 +4,12 @@
 
 Masteroid::Masteroid() {}
 
-Masteroid::setup()
+void Masteroid::setup()
 {
   init();
 }
 
-Masteroid::loop()
+void Masteroid::loop()
 {
   if (slip.packetAvailable())
   {
@@ -24,7 +24,7 @@ Masteroid::loop()
   update();
 }
 
-Masteroid::sendOSC(OSC::Message *msg)
+void Masteroid::sendOSC(OSC::Message *msg)
 {
   int len = msg->length();
   unsigned char *packet = (unsigned char *) malloc(len);

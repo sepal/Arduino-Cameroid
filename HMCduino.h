@@ -69,13 +69,13 @@ public:
   /**
    * Zoom in or out depending on the speed, which should be between -13 and 13.
    */
-  void zoom(int speed) {
+  void zooming(int speed) {
     if (speed > 13) {
       this->zoomIn(speed);
     } else if (speed<0) {
       zoomOut(abs(speed));
     } else {
-      zoom->moveTo(CAM_ZOOM_OFF);
+      zoom.moveTo(CAM_ZOOM_OFF);
     }
   }
 
@@ -84,19 +84,19 @@ public:
    */
   void zoomReset(bool on) {
     if (on == true) {
-      zoom->asyncMoveUp();
+      zoom.asyncMoveUp();
     } else {
-      zoom->asyncMoveStop();
+      zoom.asyncMoveStop();
     }
   }
 
   void resetMode(bool on) {
     if (on == true)
     {
-      zoom->asyncMoveUp();
+      zoom.asyncMoveUp();
     } else {
-      zoom->asyncMoveStop();
-      zoom->resetCounter();
+      zoom.asyncMoveStop();
+      zoom.resetCounter();
     }
   }
 
@@ -112,7 +112,7 @@ public:
   }
 
   void loop() {
-    zoom->update();
+    zoom.update();
   }
 protected:
   /**
@@ -122,7 +122,7 @@ protected:
    */
   void zoomIn(int speed) {
     speed = constrain(speed, 0, 12);
-    zoom->moveTo(CAM_ZOOM_LOW_MAX-speed);
+    zoom.moveTo(CAM_ZOOM_LOW_MAX-speed);
   }
 
   /**
@@ -132,7 +132,7 @@ protected:
    */
   void zoomOut(int speed) {
     speed = constrain(speed, 0, 12);
-    zoom->moveTo(CAM_ZOOM_HI_MIN+speed);
+    zoom.moveTo(CAM_ZOOM_HI_MIN+speed);
   }
 
   int pinRec;

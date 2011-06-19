@@ -1,9 +1,12 @@
 
+
 #ifndef _MASTEROID_H_
 #define _MASTEROID_H_
 
+
 #include "SLIPSerialUsb.h"
 #include "OSCMessage.h"
+
 
 /**
  * Abstract Masteroid class that allows you to send and receive OSC Messages.
@@ -30,18 +33,18 @@ protected:
   /**
    * This function will be called on setup.
    */
-  virtual void init() = 0;
+  virtual void init() {};
 
   /**
    * This function will be called in the loop.
    */
-  virtual void update() = 0;
+  virtual void update() {};
 
   /**
    * Will be triggered as soon as the Masteroid receives a OSC Messages via SLIP.
    * @param msg The message that was received.
    */
-  virtual void eventOSC(OSC::Message *msg) = 0;
+  virtual void eventOSC(OSC::Message *msg) {};
 
   /**
    * Sends an OSC Message via SLIP
