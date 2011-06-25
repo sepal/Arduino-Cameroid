@@ -21,11 +21,13 @@
  * support dolly control.
  */
 
-#include "Masteroid.h"
-#include "HMCduino.h"
 
 #ifndef _CAMEROID_H_
 #define _CAMEROID_H_
+
+#include "Masteroid.h"
+#include "HMCduino.h"
+#include "SoftTimer.h"
 
 /**
  * Masteroid for a Panasonic HMC151 camera.
@@ -60,7 +62,28 @@ protected:
 
   void update()
   {
-    
+    hmc.update();
+    if (timelapse) {
+      /*if (trRecCountdown.ready()) {
+        hmc.record(true);
+        trRecDuration.start(tlRecDuration);
+      }
+      if (trRecDuration.ready()) {
+        hmc.record(false);
+        trRecDuration.stop();
+      }
+      if (trZoomCountDown.ready()) {
+        Serial.println("zoom start");
+        hmc.zooming(tlZoomSpeed);
+        Serial.println(tlZoomSpeed);
+        trZoomDuration.start(tlZoomDuration);
+      }
+      if (trZoomDuration.ready()) {
+        Serial.println("zoom stop");
+        hmc.zooming(0);
+        trZoomDuration.stop();
+      }
+    }
   }
 
   void eventOSC(OSC::Message *msg)
@@ -79,9 +102,13 @@ protected:
       {
         hmc.record((msg->getInt(0)) ? true : false);
       }
+      if (address.startsWith("/cameroid/timelapse")) {
+        timeLapseOSC(msg);
+      }
     }
   }
 private:
+  
   HMCControl hmc;
 
   bool timelapse;
@@ -89,21 +116,82 @@ private:
 
   // If set(>1), the time-laspe will function for the given duration and all 
   // other timer paramters may be set automatically(look for the other notes).
-  long tlDuration; 
+  float tlDuration; 
   // Time for the next shot.
-  long tlRecCountdown;
+  float tlRecCountdown;
   // How long should one record take.
-  long tlRecDuration; 
+  float tlRecDuration; 
   // Where should the zoom start to move. Camera will have to reset
   // the digipot to determain the (almost) exact position.
-  int tlZoomInit;
+  float tlZoomInit;
   // If set(>-1) together with tlDuration and tlZoomSpeed, the programm will
   // automatically also set tlZoomCountDown.
-  int tlZoomEnd;
+  float tlZoomEnd;
   // The speed of the zoom.
-  long tlZoomSpeed;
+  int tlZoomSpeed;
   // Countdown for the zoom to move.
-  long tlZoomCountDown;
+  float tlZoomCountDown;
+  // How long should be zoomed.
+  float tlZoomDuration;
+  
+  SoftTimer trRecCountdown;
+  SoftTimer trRecDuration;
+  SoftTimer trZoomCountDown;
+  SoftTimer trZoomDuration;
+  
+  
+  /**
+   * Handle the OSC messages for time-lapse.
+   */
+  void timeLapseOSC(OSC::Message *msg) {
+    String address = msg->getAddress();
+    String typetag = msg->getTypeTag();
+    if (address.equals("/cameroid/timelapse/duration") && typetag.equals("f")) {
+      tlDuration = msg->getFloat(0);
+    }
+    if (address.equals("/cameroid/timelapse/reccountdown") && typetag.equals("f")) {
+      tlRecCountdown = msg->getFloat(0);
+    }
+    if (address.equals("/cameroid/timelapse/recduration") && typetag.equals("f")) {
+      tlRecDuration = msg->getFloat(0);
+    }
+    if (address.equals("/cameroid/timelapse/zoominit") && typetag.equals("f")) {
+      tlZoomInit = msg->getFloat(0);
+    }
+    if (address.equals("/cameroid/timelapse/zoomend") && typetag.equals("f")) {
+      tlZoomEnd = msg->getFloat(0);
+    }
+    if (address.equals("/cameroid/timelapse/zoomspeed") && typetag.equals("f")) {
+      tlZoomSpeed = msg->getFloat(0);
+    }
+    if (address.equals("/cameroid/timelapse/zoomcountdown") && typetag.equals("f")) {
+      tlZoomCountDown = msg->getFloat(0);
+    }
+    if (address.equals("/cameroid/timelapse/config") && typetag.equals("ffffi")) {
+      Serial.println("Recieved timelapse config.");
+      tlRecCountdown = msg->getFloat(0);
+      tlRecDuration = msg->getFloat(1);
+      tlZoomCountDown = msg->getFloat(2);
+      tlZoomDuration = msg->getFloat(3);
+      tlZoomSpeed = msg->getInt(4);
+    }
+    if (address.equals("/cameroid/timelapse/start") && typetag.equals("i")) {
+      if (msg->getInt(0) == 1) {
+        Serial.println("Starting timeplapse.");
+        timelapse = true;
+        trRecCountdown.start(tlRecCountdown);
+        trZoomCountDown.start(tlZoomCountDown);
+      } else {
+        Serial.println("Stoping timeplapse.");
+        hmc.record(false);
+        trRecCountdown.stop();
+        trZoomCountDown.stop();
+        trRecDuration.stop();
+        trZoomDuration.stop();
+        timelapse = false;
+      }
+    }
+  }
 };
 
 #endif

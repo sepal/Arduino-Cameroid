@@ -70,8 +70,8 @@ public:
    * Zoom in or out depending on the speed, which should be between -13 and 13.
    */
   void zooming(int speed) {
-    if (speed > 13) {
-      this->zoomIn(speed);
+    if (speed > 0) {
+      zoomIn(speed);
     } else if (speed<0) {
       zoomOut(abs(speed));
     } else {
@@ -87,6 +87,7 @@ public:
       zoom.asyncMoveUp();
     } else {
       zoom.asyncMoveStop();
+      zoom.resetCounter();
     }
   }
 
@@ -98,6 +99,10 @@ public:
       zoom.asyncMoveStop();
       zoom.resetCounter();
     }
+  }
+  
+  bool recording() {
+    return recState;
   }
 
   /**
@@ -111,7 +116,7 @@ public:
     }
   }
 
-  void loop() {
+  void update() {
     zoom.update();
   }
 protected:
@@ -132,6 +137,7 @@ protected:
    */
   void zoomOut(int speed) {
     speed = constrain(speed, 0, 12);
+    Serial.println(CAM_ZOOM_HI_MIN-speed);
     zoom.moveTo(CAM_ZOOM_HI_MIN+speed);
   }
 

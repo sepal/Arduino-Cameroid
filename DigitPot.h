@@ -23,6 +23,8 @@
 #ifndef _DIGIPOT_H_
 #define _DIGIPOT_H_
 
+#include "WProgram.h"
+
 /**
  * Controls a Xiroc X9CXXX digital potentiometer.
  *
@@ -37,10 +39,16 @@
 class DigiPot
 {
 public:
+  DigiPot() {}
+  
   /**
    * Init the Digital Potentiometer.
    */
   DigiPot(int potINCPin, int potUDPin, int potCSPin) {
+    init(potINCPin, potUDPin, potCSPin);
+  }
+  
+  void init(int potINCPin, int potUDPin, int potCSPin) {
     pinINC = potINCPin;
     pinUD = potUDPin;
     pinCS = potCSPin;
@@ -53,7 +61,7 @@ public:
     pinMode(pinINC, OUTPUT);
     pinMode(pinUD, OUTPUT);
     digitalWrite(pinINC, HIGH);
-    digitalWrite(pinUD, LOW);
+    digitalWrite(pinUD, HIGH);
 
     wiperPos = 0;
     asyncMove = false;
@@ -103,21 +111,16 @@ public:
 
   /**
    * Will either increase or decrease the wiper position.
+   * 
+   * @return The possible position of the wiper, you'll need to check your self
+   *   if it's out or range.
    */
   int update() {
     if (asyncMove) {
-      if (wiperPos > 99) {
-        moveTo(99);
-        asyncMove = false;
-      } else if (wiperPos < 0) {
-        moveTo(0);
-        asyncMove = false;
-      } else {
-        digitalWrite(pinINC, LOW);
-        delayMicroseconds(10);
-        digitalWrite(pinINC, HIGH);
-        wiperPos += asyncDir;
-      }
+      digitalWrite(pinINC, LOW);
+      delayMicroseconds(10);
+      digitalWrite(pinINC, HIGH);
+      wiperPos += asyncDir;
     }
     return wiperPos;
   }
@@ -135,7 +138,7 @@ public:
   int resetCounter() {
     wiperPos = 99;
   }
-protected:
+public:
   int pinINC;
   int pinCS;
   int pinUD;
@@ -146,9 +149,9 @@ protected:
   int wiperPos;
 
   void moveDownTo(int pos) {
-    if (pos > 0) {
+    if (pos >= 0) {
       digitalWrite(pinUD, LOW);
-      delayMicroseconds(100);
+      delayMicroseconds(10);
       while(wiperPos > pos) {
         digitalWrite(pinINC, LOW);
         delayMicroseconds(10);
@@ -159,10 +162,10 @@ protected:
   }
 
   void moveUpTo(int pos) {
-    if (pos < 99) {
+    if (pos <= 99) {
       digitalWrite(pinUD, HIGH);
-      delayMicroseconds(100);
-      while(wiperPos > pos) {
+      delayMicroseconds(10);
+      while(wiperPos < pos) {
         digitalWrite(pinINC, LOW);
         delayMicroseconds(10);
         digitalWrite(pinINC, HIGH);
