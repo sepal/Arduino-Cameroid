@@ -32,7 +32,7 @@ public:
     last = 0;
     time = 0;
   }
-  void start(int seconds) {
+  void start(float seconds) {
     time = seconds*1000;
     last = millis();
     started = true;

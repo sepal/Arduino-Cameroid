@@ -64,7 +64,7 @@ protected:
   {
     hmc.update();
     if (timelapse) {
-      /*if (trRecCountdown.ready()) {
+      if (trRecCountdown.ready()) {
         hmc.record(true);
         trRecDuration.start(tlRecDuration);
       }
@@ -73,13 +73,10 @@ protected:
         trRecDuration.stop();
       }
       if (trZoomCountDown.ready()) {
-        Serial.println("zoom start");
         hmc.zooming(tlZoomSpeed);
-        Serial.println(tlZoomSpeed);
         trZoomDuration.start(tlZoomDuration);
       }
       if (trZoomDuration.ready()) {
-        Serial.println("zoom stop");
         hmc.zooming(0);
         trZoomDuration.stop();
       }
