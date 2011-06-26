@@ -31,11 +31,18 @@ public:
     started = false;
     last = 0;
     time = 0;
+    offset = 0;
   }
+  
   void start(float seconds) {
     time = seconds*1000;
     last = millis();
     started = true;
+  }
+  
+  void start(float seconds, float startDelay) {
+    offset = startDelay*1000;
+    start(seconds);
   }
   
   void stop() {
@@ -44,8 +51,9 @@ public:
   
   bool ready() {
     if (started) {
-      if (millis()-last > time) {
+      if (millis()-last > time+offset) {
         last = millis();
+        offset = 0;
         return true;
       }
     }
@@ -56,6 +64,7 @@ private:
   long last;
   long time;
   bool started;
+  int offset;
 };
 
 #endif
