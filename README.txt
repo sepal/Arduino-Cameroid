@@ -47,7 +47,7 @@ Hardware:
 * An MC14060 Quad digital switch/multiplexer
 
 Software:
-* My SLIP OSC class ()
+* My Serial SLIP OSC class (https://github.com/sepal/Arduino-Serial-SLIP-OSC)
 
 Contact/Support
 ---------------
