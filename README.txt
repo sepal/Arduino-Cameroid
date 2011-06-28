@@ -44,7 +44,7 @@ Requirements
 Hardware:
 * Arduino (code is currently optimized for UNO)
 * An Xiroc X9C503 50k digital Potentiometer
-* An MC14060 Quad digital switch/multiplexer
+* An MC14016 Quad digital switch/multiplexer
 
 Software:
 * My Serial SLIP OSC class (https://github.com/sepal/Arduino-Serial-SLIP-OSC)
