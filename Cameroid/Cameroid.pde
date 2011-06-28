@@ -1,3 +1,4 @@
+
 /**
  * @file
  * @author  Sebastian Gilits <sep.gil@gmail.com>
@@ -20,8 +21,8 @@
  * @section DESCRIPTION
  * Digital and automated camera control, currently for the Panasonic HMC151 only. 
  */
- 
- 
+
+#include <EEPROM.h>
 #include <ByteUtilities.h>
 #include <OSCMessage.h>
 #include <SLIP.h>

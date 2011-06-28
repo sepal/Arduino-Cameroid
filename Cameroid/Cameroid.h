@@ -26,6 +26,8 @@
 #ifndef _CAMEROID_H_
 #define _CAMEROID_H_
 
+#include <EEPROM.h>
+#include <ByteUtilities.h>
 #include "Masteroid.h"
 #include "HMCduino.h"
 #include "SoftTimer.h"
@@ -141,12 +143,12 @@ private:
    */
   void timeLapseSave() {
     byte mem[5][3];
-    ByteUtilities::float2Byte(tlRecCountdown, &mem[0]);
-    ByteUtilities::float2Byte(tlRecDuration, &mem[1]);
-    ByteUtilities::float2Byte(tlZoomCountDown, &mem[2]);
-    ByteUtilities::float2Byte(tlZommCDOffset, &mem[3]);
-    ByteUtilities::float2Byte(tlZoomDuration, &mem43]);
-    ByteUtilities::float2Byte(tlZoomSpeed, &mem[5]);
+    ByteUtilities::float2Byte(tlRecCountdown, mem[0]);
+    ByteUtilities::float2Byte(tlRecDuration, mem[1]);
+    ByteUtilities::float2Byte(tlZoomCountDown, mem[2]);
+    ByteUtilities::float2Byte(tlZommCDOffset, mem[3]);
+    ByteUtilities::float2Byte(tlZoomDuration, mem[43]);
+    ByteUtilities::float2Byte(tlZoomSpeed, mem[5]);
     
     int idx = 0;
     for (int i=0; i<6; i++) {
@@ -171,12 +173,12 @@ private:
       }
     }
     
-    tlRecCountdown = ByteUtilities::byte2Float(&mem[0]);
-    tlRecDuration = ByteUtilities::byte2Float(&mem[1]);
-    tlZoomCountDown = ByteUtilities::byte2Float(&mem[2]);
-    tlZommCDOffset = ByteUtilities::byte2Float(&mem[3]);
-    tlZoomDuration = ByteUtilities::byte2Float(&mem[4]);
-    tlZoomSpeed = ByteUtilities::byte2Float(&mem[5]);
+    tlRecCountdown = ByteUtilities::byte2Float(mem[0]);
+    tlRecDuration = ByteUtilities::byte2Float(mem[1]);
+    tlZoomCountDown = ByteUtilities::byte2Float(mem[2]);
+    tlZommCDOffset = ByteUtilities::byte2Float(mem[3]);
+    tlZoomDuration = ByteUtilities::byte2Float(mem[4]);
+    tlZoomSpeed = ByteUtilities::byte2Float(mem[5]);
   }
   
   /**
