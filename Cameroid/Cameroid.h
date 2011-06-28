@@ -58,6 +58,9 @@ protected:
     // Additional display message for the user.
     msg.add("Cameroid initialized.");
     this->sendOSC(&msg);
+    
+    // Load the last saved timelapse config from the EEPROM.
+    timeLapseLoad();
   }
 
   void update()
@@ -74,7 +77,7 @@ protected:
       }
       if (trZoomCountDown.ready()) {
         hmc.zooming(tlZoomSpeed);
-        trZoomDuration.start(tlZoomDuration);
+        trZoomDuration.start(tlZoomDuration, tlZommCDOffset);
       }
       if (trZoomDuration.ready()) {
         hmc.zooming(0);
@@ -98,8 +101,7 @@ protected:
       } else if (address.equals("/cameroid/record") && typetag.equals("i"))
       {
         hmc.record((msg->getInt(0)) ? true : false);
-      }
-      if (address.startsWith("/cameroid/timelapse")) {
+      } else if (address.startsWith("/cameroid/timelapse")) {
         timeLapseOSC(msg);
       }
     }
@@ -111,9 +113,7 @@ private:
   bool timelapse;
   // Time-lapse paramters
 
-  // If set(>1), the time-laspe will function for the given duration and all 
-  // other timer paramters may be set automatically(look for the other notes).
-  float tlDuration; 
+  
   // Time for the next shot.
   float tlRecCountdown;
   // How long should one record take.
@@ -121,13 +121,12 @@ private:
   // Where should the zoom start to move. Camera will have to reset
   // the digipot to determain the (almost) exact position.
   float tlZoomInit;
-  // If set(>-1) together with tlDuration and tlZoomSpeed, the programm will
-  // automatically also set tlZoomCountDown.
-  float tlZoomEnd;
   // The speed of the zoom.
   int tlZoomSpeed;
   // Countdown for the zoom to move.
   float tlZoomCountDown;
+  // Timr offset.
+  float tlZommCDOffset;
   // How long should be zoomed.
   float tlZoomDuration;
   
@@ -136,6 +135,48 @@ private:
   SoftTimer trZoomCountDown;
   SoftTimer trZoomDuration;
   
+  /**
+   * Save the time-lapse config into the EEPROM.
+   */
+  void timeLapseSave() {
+    byte mem[5][3];
+    ByteUtilities::float2Byte(tlRecCountdown, &mem[0]);
+    ByteUtilities::float2Byte(tlRecDuration, &mem[1]);
+    ByteUtilities::float2Byte(tlZoomCountDown, &mem[2]);
+    ByteUtilities::float2Byte(tlZommCDOffset, &mem[3]);
+    ByteUtilities::float2Byte(tlZoomDuration, &mem43]);
+    ByteUtilities::float2Byte(tlZoomSpeed, &mem[5]);
+    
+    int idx = 0;
+    for (int i=0; i<6; i++) {
+      for (int j=0; j<4; j++) {
+        EEPROM.write(idx, mem[i][j]);
+        idx++;
+      }
+    }
+  }
+  
+  /**
+   * Load the timelapse config form the EEPROM.
+   */
+  void timeLapseLoad() {
+    byte mem[5][3];
+    
+    int idx = 0;
+    for (int i=0; i<6; i++) {
+      for (int j=0; j<4; j++) {
+        mem[i][j] = EEPROM.read(idx);
+        idx++;
+      }
+    }
+    
+    tlRecCountdown = ByteUtilities::byte2Float(&mem[0]);
+    tlRecDuration = ByteUtilities::byte2Float(&mem[1]);
+    tlZoomCountDown = ByteUtilities::byte2Float(&mem[2]);
+    tlZommCDOffset = ByteUtilities::byte2Float(&mem[3]);
+    tlZoomDuration = ByteUtilities::byte2Float(&mem[4]);
+    tlZoomSpeed = ByteUtilities::byte2Float(&mem[5]);
+  }
   
   /**
    * Handle the OSC messages for time-lapse.
@@ -143,34 +184,14 @@ private:
   void timeLapseOSC(OSC::Message *msg) {
     String address = msg->getAddress();
     String typetag = msg->getTypeTag();
-    if (address.equals("/cameroid/timelapse/duration") && typetag.equals("f")) {
-      tlDuration = msg->getFloat(0);
-    }
-    if (address.equals("/cameroid/timelapse/reccountdown") && typetag.equals("f")) {
-      tlRecCountdown = msg->getFloat(0);
-    }
-    if (address.equals("/cameroid/timelapse/recduration") && typetag.equals("f")) {
-      tlRecDuration = msg->getFloat(0);
-    }
-    if (address.equals("/cameroid/timelapse/zoominit") && typetag.equals("f")) {
-      tlZoomInit = msg->getFloat(0);
-    }
-    if (address.equals("/cameroid/timelapse/zoomend") && typetag.equals("f")) {
-      tlZoomEnd = msg->getFloat(0);
-    }
-    if (address.equals("/cameroid/timelapse/zoomspeed") && typetag.equals("f")) {
-      tlZoomSpeed = msg->getFloat(0);
-    }
-    if (address.equals("/cameroid/timelapse/zoomcountdown") && typetag.equals("f")) {
-      tlZoomCountDown = msg->getFloat(0);
-    }
-    if (address.equals("/cameroid/timelapse/config") && typetag.equals("ffffi")) {
+    if (address.equals("/cameroid/timelapse/config") && typetag.equals("fffffi")) {
       Serial.println("Recieved timelapse config.");
       tlRecCountdown = msg->getFloat(0);
       tlRecDuration = msg->getFloat(1);
       tlZoomCountDown = msg->getFloat(2);
-      tlZoomDuration = msg->getFloat(3);
-      tlZoomSpeed = msg->getInt(4);
+      tlZommCDOffset = msg->getFloat(3);
+      tlZoomDuration = msg->getFloat(4);
+      tlZoomSpeed = msg->getInt(5);
     }
     if (address.equals("/cameroid/timelapse/start") && typetag.equals("i")) {
       if (msg->getInt(0) == 1) {
@@ -187,6 +208,8 @@ private:
         trZoomDuration.stop();
         timelapse = false;
       }
+    } else if (address.equals("/cameroid/timelapse/save")) {
+      timeLapseSave();
     }
   }
 };
