@@ -51,19 +51,11 @@ public:
 protected:
   void init()
   {
-    // Send init message.
-    OSC::Message msg("/sys/init");
-    // Main container
-    msg.add("cameroid");
-    // Send 1 if cameroid was initialized well.
-    // Will be replaced by TRUE/FALSE types.
-    msg.add(1);
-    // Additional display message for the user.
-    msg.add("Cameroid initialized.");
-    this->sendOSC(&msg);
-    
     // Load the last saved timelapse config from the EEPROM.
-    timeLapseLoad();
+    /*timeLapseLoad();
+    OSC::Message init("/sys/init");
+    init.add("cameroid");
+    sendOSC(&init);*/
   }
 
   void update()
@@ -80,7 +72,7 @@ protected:
       }
       if (trZoomCountDown.ready()) {
         hmc.zooming(tlZoomSpeed);
-        trZoomDuration.start(tlZoomDuration, tlZommCDOffset);
+        trZoomDuration.start(tlZoomDuration, tlZoomCDOffset);
       }
       if (trZoomDuration.ready()) {
         hmc.zooming(0);
@@ -98,11 +90,9 @@ protected:
       if (address.equals("/cameroid/zoom") && typetag.equals("i")) {
         int speed = msg->getInt(0); 
         hmc.zooming(speed);
-      } else if (address.equals("/cameroid/zoomreset") && typetag.equals("i"))
-      {
+      } else if (address.equals("/cameroid/zoomreset") && typetag.equals("i")) {
         hmc.zoomReset((msg->getInt(0)) ? true : false);
-      } else if (address.equals("/cameroid/record") && typetag.equals("i"))
-      {
+      } else if (address.equals("/cameroid/record") && typetag.equals("i")) {
         hmc.record((msg->getInt(0)) ? true : false);
       } else if (address.startsWith("/cameroid/timelapse")) {
         timeLapseOSC(msg);
@@ -129,7 +119,7 @@ private:
   // Countdown for the zoom to move.
   float tlZoomCountDown;
   // Timr offset.
-  float tlZommCDOffset;
+  float tlZoomCDOffset;
   // How long should be zoomed.
   float tlZoomDuration;
   
@@ -146,7 +136,7 @@ private:
     ByteUtilities::float2Byte(tlRecCountdown, mem[0]);
     ByteUtilities::float2Byte(tlRecDuration, mem[1]);
     ByteUtilities::float2Byte(tlZoomCountDown, mem[2]);
-    ByteUtilities::float2Byte(tlZommCDOffset, mem[3]);
+    ByteUtilities::float2Byte(tlZoomCDOffset, mem[3]);
     ByteUtilities::float2Byte(tlZoomDuration, mem[43]);
     ByteUtilities::float2Byte(tlZoomSpeed, mem[5]);
     
@@ -176,7 +166,7 @@ private:
     tlRecCountdown = ByteUtilities::byte2Float(mem[0]);
     tlRecDuration = ByteUtilities::byte2Float(mem[1]);
     tlZoomCountDown = ByteUtilities::byte2Float(mem[2]);
-    tlZommCDOffset = ByteUtilities::byte2Float(mem[3]);
+    tlZoomCDOffset = ByteUtilities::byte2Float(mem[3]);
     tlZoomDuration = ByteUtilities::byte2Float(mem[4]);
     tlZoomSpeed = ByteUtilities::byte2Float(mem[5]);
   }
@@ -192,7 +182,7 @@ private:
       tlRecCountdown = msg->getFloat(0);
       tlRecDuration = msg->getFloat(1);
       tlZoomCountDown = msg->getFloat(2);
-      tlZommCDOffset = msg->getFloat(3);
+      tlZoomCDOffset = msg->getFloat(3);
       tlZoomDuration = msg->getFloat(4);
       tlZoomSpeed = msg->getInt(5);
     }
@@ -212,7 +202,9 @@ private:
         timelapse = false;
       }
     } else if (address.equals("/cameroid/timelapse/save")) {
-      timeLapseSave();
+      ///timeLapseSave();
+    } else if (address.equals("/cameroid/timelapse/load")) {
+      //timeLapseLoad();
     }
   }
 };

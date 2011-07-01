@@ -1,4 +1,3 @@
-
 /**
  * @file
  * @author  Sebastian Gilits <sep.gil@gmail.com>
@@ -15,11 +14,12 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU General Public License           
  * along with Cameroid.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @section DESCRIPTION
- * Digital and automated camera control, currently for the Panasonic HMC151 only. 
+ * Digital and automated camera control, currently for the Panasonic 
+ * HMC151 only. 
  */
 
 #include <EEPROM.h>
@@ -29,8 +29,6 @@
 #include <SLIPSerialUsb.h>                              
 
 #include "Cameroid.h"
-
-
 
 Cameroid cam(7, 6, 5, 4);
 
