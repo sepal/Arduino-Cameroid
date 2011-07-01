@@ -60,7 +60,7 @@ void lcdSetPos(int pos) {
   
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
   lcdSerial.begin(9600);
   
   lcdSerial.print(124, BYTE);   // 124 bzw. 0x7C- Befehl für Displaybeleuchtung

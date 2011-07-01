@@ -33,7 +33,7 @@
 Cameroid cam(7, 6, 5, 4);
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
   cam.setup();
 }
 
